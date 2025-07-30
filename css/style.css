@@ -2591,6 +2591,7 @@ body[data-theme="dark"] .footer-bottom {
     
     .social-links {
         justify-content: center;
+        margin-bottom: 10px;
     }
 }
 
