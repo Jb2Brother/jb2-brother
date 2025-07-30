@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Admin | JB2 Brother</title>
+    <link rel="icon" href="/img/image.png" type="image/x-icon">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="sub-page">
+
+    <!-- =========== HEADER =========== -->
+    <header id="header">
+        <nav class="container">
+            <a href="/" class="logo">
+                <img src="/img/logo-dark.png" alt="Logo JB2 Brother">
+                <span>JB2 Brother</span>
+            </a>
+            <div class="nav-right-items">
+                <button id="theme-toggle" class="theme-toggle"><i class="fas fa-sun"></i></button>
+                <button id="logout-button" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="toast-container"></div>
+        
+        <section class="section">
+            <div class="container">
+                <div class="admin-main-container">
+
+                    <!-- ======================================================= -->
+                    <!-- ==    NUEVO CONTENEDOR PARA LA PRIMERA COLUMNA       == -->
+                    <!-- ======================================================= -->
+                    <div class="admin-column-wrapper">
+                        <!-- SECCIÓN DE PERFIL -->
+                        <div id="profile-management-section">
+                            <div class="admin-section">
+                                <h3>Actualizar Perfil</h3>
+                                <form id="profile-form">
+                                    <div class="form-group">
+                                        <img id="avatar-preview" src="https://via.placeholder.com/150" alt="Avatar Preview" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; display: block; margin-bottom: 1rem;">
+                                        <label for="avatar-file">Cambiar Avatar</label>
+                                        <input type="file" id="avatar-file" accept="image/*">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="full-name">Nombre Completo</label>
+                                        <input type="text" id="full-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="job-title">Título Profesional</label>
+                                        <input type="text" id="job-title">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bio">Biografía</label>
+                                        <textarea id="bio" rows="4"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Guardar Perfil</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- SECCIÓN DE CREDENCIALES -->
+                        <div id="credentials-section" class="admin-section-hidden">
+                            <div class="admin-section">
+                                <h3>Credenciales del Equipo</h3>
+                                <div class="form-group">
+                                    <label for="master-password-input">Introduce la Contraseña Maestra para ver</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="password" id="master-password-input" placeholder="Contraseña Maestra" style="flex-grow: 1;">
+                                        <button id="show-credentials-btn" class="btn btn-secondary">Mostrar</button>
+                                    </div>
+                                </div>
+                                <div id="credentials-list" style="margin-top: 1.5rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- ======================================================= -->
+                    <!-- ==        SECCIÓN DE PROYECTOS (SEGUNDA COLUMNA)     == -->
+                    <!-- ======================================================= -->
+                    <div id="project-management-section">
+                        <div class="admin-section">
+                            <h3 style="margin-top: 2rem;">Mis Proyectos</h3>
+                            <div id="projects-list">Cargando proyectos...</div>
+                            <br>
+                            <h3>Añadir Nuevo Proyecto</h3>
+                            <form id="project-form">
+                                <div class="form-group"><label for="project-title">Título del Proyecto</label><input type="text" id="project-title" required></div>
+                                <div class="form-group"><label for="project-description">Descripción</label><textarea id="project-description" rows="3" required></textarea></div>
+                                <div class="form-group"><label for="project-objetivo">Objetivo</label><textarea id="project-objetivo" rows="2"></textarea></div>
+                                <div class="form-group"><label for="project-solucion">Solución</label><textarea id="project-solucion" rows="2"></textarea></div>
+                                <div class="form-group">
+                                    <label>Tecnologías</label>
+                                    <div class="tech-selector-container">
+                                        <div id="selected-techs" class="selected-techs-container"></div>
+                                        <input type="text" id="tech-search-input" placeholder="Buscar y añadir tecnología...">
+                                        <div id="tech-dropdown" class="tech-dropdown-container"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="project-image">Imagen del Proyecto (Obligatoria)</label><input type="file" id="project-image" accept="image/*" required></div>
+                                <div class="form-group"><label for="project-live-url">URL del Proyecto en Vivo</label><input type="url" id="project-live-url"></div>
+                                <div class="form-group"><label for="project-code-url">URL del Código Fuente</label><input type="url" id="project-code-url"></div>
+                                <button type="submit" class="btn btn-primary">Añadir Proyecto</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN EXCLUSIVA PARA SUPER ADMIN -->
+                    <div id="user-management-section" class="admin-section-hidden">
+                        <div class="user-management-grid">
+                            
+                            <div class="admin-section">
+                                <h3>Gestionar Miembros (Admin)</h3>
+                                <input type="text" id="user-search-input" placeholder="Buscar miembro por nombre o username...">
+                                <div id="users-list" style="margin-top: 1.5rem;">Cargando usuarios...</div>
+                            </div>
+                            
+                            <div class="admin-section">
+                                <h3>Crear Nuevo Miembro</h3>
+                                <form id="create-user-form">
+                                    <div class="form-group"><label for="new-user-fullname">Nombre Completo</label><input type="text" id="new-user-fullname" required></div>
+                                    <div class="form-group"><label for="new-user-username">Username (único)</label><input type="text" id="new-user-username" required></div>
+                                    <div class="form-group"><label for="new-user-email">Email</label><input type="email" id="new-user-email" required></div>
+                                    <div class="form-group"><label for="new-user-password">Contraseña Temporal</label><input type="password" id="new-user-password" required></div>
+                                    <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                                </form>
+                                
+                                <h3 style="margin-top: 2rem;">Añadir Credencial de Equipo</h3>
+                                <form id="credential-form">
+                                    <div class="form-group">
+                                        <label for="credential-app-name">Nombre de App/Servicio</label>
+                                        <input type="text" id="credential-app-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="credential-email">Email / Usuario</label>
+                                        <input type="text" id="credential-email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="credential-password">Contraseña</label>
+                                        <input type="password" id="credential-password" required>
+                                    </div>
+                                     <div class="form-group">
+                                        <label for="credential-master-password">Contraseña Maestra (para cifrar)</label>
+                                        <input type="password" id="credential-master-password" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Guardar Credencial</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modales -->
+        <div id="user-info-modal" class="modal-overlay hidden">
+            <div id="user-info-content" class="modal-content user-info-card"></div>
+        </div>
+        <div id="confirm-modal" class="modal-overlay hidden">
+            <div class="modal-content confirm-dialog">
+                <h3 id="confirm-title">Confirmar Acción</h3>
+                <p id="confirm-message">¿Estás seguro?</p>
+                <div class="confirm-actions">
+                    <button id="confirm-cancel-btn" class="btn btn-secondary">Cancelar</button>
+                    <button id="confirm-ok-btn" class="btn btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+ 
+
+    <script type="module" src="/js/admin.js"></script>
+</body>
+</html>

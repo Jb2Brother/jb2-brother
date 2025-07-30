@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Miembro | JB2 Brother</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/img/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="sub-page profile-page-redesigned">
+
+    <header id="header">
+        <nav class="container">
+            <a href="/" class="logo">
+                <img src="/img/logo-dark.png" alt="Icono de JB2 Brother">
+                <span>JB2 Brother</span>
+            </a>
+            <div class="nav-right-items">
+                <ul class="nav-links" id="nav-menu">
+                    <div class="nav-close" id="nav-close"><i class="fas fa-times"></i></div>
+                    <li><a href="/" class="nav-link">Inicio</a></li>
+                    <li><a href="/#team" class="nav-link">Equipo</a></li>
+                    <li><a href="/contacto.html" class="nav-link">Contacto</a></li>
+                </ul>
+                <button id="theme-toggle" class="theme-toggle">
+                     <i class="fas fa-sun"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div id="profile-dynamic-content">
+            <div id="loader" class="section container" style="padding-top: calc(var(--header-height) + 4rem); text-align: center; font-size: 1.5rem;">Cargando perfil...</div>
+            <!-- El contenido dinámico del perfil se insertará aquí -->
+        </div>
+    </main>
+    
+    <div id="toast-container" class="toast-container"></div>
+    
+    <footer id="footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <a href="/" class="logo">
+                    <img src="/img/logo-dark.png" alt="Icono de JB2 Brother">
+                    <div class="logo-text-stack">
+                        <span class="logo-text-main">JB2</span>
+                        <span class="logo-text-sub">BROTHER</span>
+                    </div>
+                </a>
+                <p>Transformando ideas en soluciones digitales impactantes. Apasionados por el código limpio y el diseño intuitivo.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navegación</h4>
+                <ul>
+                    <li><a href="/proyectos.html">Proyectos</a></li>
+                    <li><a href="/#team">Equipo</a></li>
+                    <li><a href="/contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Acceso</h4>
+                <ul>
+                    <li><a href="/login.html">Área de Miembros</a></li>
+                    <li><a href="#">Política de Privacidad</a></li>
+                    <li><a href="#">Términos de Servicio</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Síguenos</h4>
+                <div class="social-links">
+                    <a href="https://github.com/Jb2Brother" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/jb2-brother-94bb8a377/" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="mailto:jb2brother@gmail.com?subject=Consulta%20sobre%20un%20Proyecto&body=Hola%20equipo%20de%20JB2%20Brother,%0A%0AQuisiera%20discutir%20lo%20siguiente:%0A%0A[Escribe aquí los detalles de tu proyecto o consulta...]%0A%0AGracias." aria-label="Email" target="_blank"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 JB2 Brother. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    
+    <!-- main.js carga las librerías necesarias como lightgallery -->
+    <script src="/js/main.js" type="module"></script>
+    <script src="/js/profile.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "portafolio-equipo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "vite": "^7.0.6"
+  },
+  "dependencies": {
+    "lightgallery": "^2.9.0-beta.1",
+    "swiper": "^11.2.10"
+  }
+}

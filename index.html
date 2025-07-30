@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JB2 Brother | Portafolio de Equipo</title>
+    <meta name="description" content="Portafolio profesional de nuestro equipo de desarrolladores. Explora nuestros proyectos y conoce a los talentos detrás del código.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="icon" href="/img/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="home-page">
+
+    <header id="header">
+        <nav class="container">
+            <a href="/" class="logo">
+                <img src="/img/logo-dark.png" alt="Icono de JB2 Brother">
+                <span>JB2 Brother</span>
+            </a>
+            <div class="nav-right-items">
+                <ul class="nav-links" id="nav-menu">
+                    <div class="nav-close" id="nav-close"><i class="fas fa-times"></i></div>
+                    <li><a href="/" class="nav-link active">Inicio</a></li>
+                    <li><a href="#team" class="nav-link">Equipo</a></li>
+                    <li><a href="/contacto.html" class="nav-link">Contacto</a></li>
+                </ul>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema">
+                     <i class="fas fa-sun"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="video-background">
+                <video autoplay muted loop playsinline src="/video/hero-video.mp4"></video>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">Innovación Hecha Código</h1>
+                <p class="hero-subtitle">Somos un colectivo de desarrolladores apasionados, transformando ideas en soluciones digitales impactantes.</p>
+                <a href="#projects" class="btn btn-primary">Explora Nuestros Proyectos</a>
+            </div>
+        </section>
+
+        <section id="intro-showcase" class="section">
+            <div class="container showcase-grid">
+                <div class="showcase-text">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">Somos JB2 Brother</h2>
+                    <p>En JB2 Brother, no solo escribimos código; creamos experiencias. Fusionamos diseño de vanguardia con ingeniería de software robusta para construir soluciones que no solo funcionan, sino que deleitan.</p>
+                    <p>Nuestra filosofía es simple: cada línea de código, cada pixel y cada interacción debe tener un propósito. Nos especializamos en dar vida a tus ideas más ambiciosas, asegurando que cada proyecto sea intuitivo, escalable y visualmente impresionante.</p>
+                    <a href="/contacto.html" class="btn btn-secondary">Hablemos de tu Proyecto</a>
+                </div>
+
+                <div class="showcase-visual">
+                    <div class="phone-container">
+                        <div class="phone-mockup">
+                            <div class="volume-button"></div>
+                            <div class="power-button"></div>
+                            <div class="phone-screen">
+                                <div class="phone-status-bar">
+                                    <span id="phone-time">1:00</span>
+                                    <div class="status-icons">
+                                        <i class="fas fa-signal"></i>
+                                        <i class="fas fa-wifi"></i>
+                                        <i class="fas fa-battery-full"></i>
+                                    </div>
+                                </div>
+                                <video autoplay muted loop playsinline>
+                                    <source src="/video/el mejor.mp4" type="video/mp4">
+                                    Tu navegador no soporta el video.
+                                </video>
+                                <div class="phone-home-bar"></div>
+                                <div class="phone-notch">
+                                    <div class="camera"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section bg-light">
+            <div class="container">
+                <h2 class="section-title">Nuestros Proyectos Recientes</h2>
+                <p class="section-intro">Un vistazo a nuestro trabajo más reciente. Cada proyecto es una historia de colaboración y excelencia técnica.</p>
+                <div class="projects-slider-container swiper">
+                    <div class="swiper-wrapper" id="projects-carousel-wrapper"></div>
+                    
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="section">
+            <div class="container">
+                <h2 class="section-title">Conoce a Nuestro Equipo</h2>
+                <div class="team-search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="team-search-input" placeholder="Buscar a un miembro por su nombre...">
+                </div>
+                <div class="swiper team-carousel">
+                    <div class="swiper-wrapper" id="team-container"></div>
+                    <div class="swiper-pagination team-pagination"></div>
+                </div>
+                <div class="swiper-button-prev team-prev"></div>
+                <div class="swiper-button-next team-next"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <a href="/" class="logo">
+                    <img src="/img/logo-dark.png" alt="Icono de JB2 Brother">
+                    <div class="logo-text-stack">
+                        <span class="logo-text-main">JB2</span>
+                        <span class="logo-text-sub">BROTHER</span>
+                    </div>
+                </a>
+                <p>Transformando ideas en soluciones digitales impactantes. Apasionados por el código limpio y el diseño intuitivo.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navegación</h4>
+                <ul>
+                    <li><a href="/proyectos.html">Proyectos</a></li>
+                    <li><a href="/#team">Equipo</a></li>
+                    <li><a href="/contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Acceso</h4>
+                <ul>
+                    <li><a href="/login.html">Área de Miembros</a></li>
+                    <li><a href="#">Política de Privacidad</a></li>
+                    <li><a href="#">Términos de Servicio</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Síguenos</h4>
+                <div class="social-links">
+                    <a href="https://github.com/Jb2Brother" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/jb2-brother-94bb8a377/" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="mailto:jb2brother@gmail.com?subject=Consulta%20sobre%20un%20Proyecto&body=Hola%20equipo%20de%20JB2%20Brother,%0A%0AQuisiera%20discutir%20lo%20siguiente:%0A%0A[Escribe aquí los detalles de tu proyecto o consulta...]%0A%0AGracias." aria-label="Email" target="_blank"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 JB2 Brother. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    
+    <div id="toast-container" class="toast-container"></div>
+    <div id="phone-zoom-overlay" class="phone-zoom-overlay"></div>
+    
+    <script src="/js/main.js" type="module"></script>
+</body>
+</html>

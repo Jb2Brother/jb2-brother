@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Miembros | JB2 Brother</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/img/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  
+    <div class="login-page-container">
+        <div class="login-form-panel">
+            <div class="login-form-wrapper">
+                <h2>Bienvenido de Nuevo</h2>
+                <p>Inicia sesión para gestionar tu portafolio.</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Tu Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" name="password" placeholder="Tu Contraseña" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </form>
+                 <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;"><a href="/" class="back-to-home-link">Volver al Inicio</a></p>
+            </div>
+        </div>
+        
+        <div class="login-brand-panel">
+            <a href="/" class="logo">
+                <img src="/img/logo-dark.png" alt="Icono de JB2 Brother">
+            </a>
+            <p>Transformando ideas en soluciones digitales impactantes. Apasionados por el código limpio y el diseño intuitivo.</p>
+        </div>
+    </div>
+    
+    
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/js/modules/auth.js" type="module"></script>
+    <!-- ui.js se carga a través de auth.js -->
+</body>
+</html>
