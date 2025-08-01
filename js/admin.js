@@ -1,11 +1,10 @@
-// ==================================================================
-//      ARCHIVO assets/js/admin.js - VERSIÓN COMPLETA Y FINAL
-// ==================================================================
+// js/admin.js
 import { supabase } from './modules/supabase.js';
 
-// --- CONSTANTES Y REFERENCIAS INICIALES ---
-const LOGO_LIGHT_THEME = '/img/logo-dark.png';
-const LOGO_DARK_THEME = '/img/logo-light.png';
+// --- IMPORTACIÓN DE IMÁGENES PARA RUTAS CORRECTAS EN PRODUCCIÓN ---
+import logoForLightTheme from '/img/logo-dark.png';
+import logoForDarkTheme from '/img/logo-light.png';
+
 let userProfile = null;
 
 // --- 1. FUNCIÓN DE NOTIFICACIONES (TOAST) ---
@@ -80,11 +79,11 @@ function applyTheme(theme) {
     if (theme === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
         if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        if (headerLogo) headerLogo.src = LOGO_DARK_THEME;
+        if (headerLogo) headerLogo.src = logoForDarkTheme; // Usamos la variable importada
     } else {
         document.body.removeAttribute('data-theme');
         if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        if (headerLogo) headerLogo.src = LOGO_LIGHT_THEME;
+        if (headerLogo) headerLogo.src = logoForLightTheme; // Usamos la variable importada
     }
 }
 
@@ -119,7 +118,6 @@ async function initializeAdminPanel() {
 
     if (profile.role === 'super_admin') {
         document.title = `Panel de Super Admin | JB2 Brother`;
-        // En la vista de super admin, mostramos la gestión de usuarios y también la de credenciales dentro de ella
         profileManagementSection.style.display = 'none';
         projectManagementSection.style.display = 'none';
         userManagementSection.classList.remove('admin-section-hidden');
@@ -522,7 +520,6 @@ async function handleAddCredential(e) {
         if (error) throw error;
         showToast('Credencial guardada de forma segura.', 'success');
         credentialForm.reset();
-        // Recargamos la lista si ya está visible
         if (credentialsList.innerHTML !== '' && !credentialsList.innerHTML.includes('<p>')) {
             handleShowCredentials();
         }
