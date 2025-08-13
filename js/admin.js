@@ -79,11 +79,11 @@ function applyTheme(theme) {
     if (theme === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
         if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        if (headerLogo) headerLogo.src = logoForDarkTheme; // Usamos la variable importada
+        if (headerLogo) headerLogo.src = logoForDarkTheme;
     } else {
         document.body.removeAttribute('data-theme');
         if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        if (headerLogo) headerLogo.src = logoForLightTheme; // Usamos la variable importada
+        if (headerLogo) headerLogo.src = logoForLightTheme;
     }
 }
 
@@ -155,18 +155,37 @@ function fillProfileForm(profile) {
     document.getElementById('avatar-preview').src = profile.URL_del_avatar || 'https://via.placeholder.com/150';
     document.getElementById('job-title').value = profile.titulo_profesional || '';
     document.getElementById('bio').value = profile.biografía || '';
+    document.getElementById('nationality').value = profile.nacionalidad || '';
+    document.getElementById('experience-years').value = profile.años_de_experiencia || '';
+    document.getElementById('habilidad_frontend').value = profile.habilidad_frontend || '';
+    document.getElementById('habilidad_backend').value = profile.habilidad_backend || '';
+    document.getElementById('habilidad_db').value = profile.habilidad_db || '';
+    document.getElementById('habilidad_herramientas').value = profile.habilidad_herramientas || '';
 }
 
 // --- 6. GESTIÓN DE PERFIL ---
 profileForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const experienceYears = document.getElementById('experience-years').value;
+
     const updates = {
         identificación: user.id,
         nombre_completo: document.getElementById('full-name').value,
         titulo_profesional: document.getElementById('job-title').value,
         biografía: document.getElementById('bio').value,
         actualizado_en: new Date(),
+        nacionalidad: document.getElementById('nationality').value,
+        años_de_experiencia: experienceYears ? parseInt(experienceYears, 10) : null,
+        // --- URLs FIJAS DE LA EMPRESA ---
+        URL_de_github: "https://github.com/Jb2Brother",
+        URL_de_LinkedIn: "https://www.linkedin.com/in/jb2-brother-94bb8a377/",
+        // --- HABILIDADES ---
+        habilidad_frontend: document.getElementById('habilidad_frontend').value,
+        habilidad_backend: document.getElementById('habilidad_backend').value,
+        habilidad_db: document.getElementById('habilidad_db').value,
+        habilidad_herramientas: document.getElementById('habilidad_herramientas').value,
     };
+
     const avatarFile = document.getElementById('avatar-file').files[0];
     if (avatarFile) {
         const filePath = `avatars/${user.id}/${Date.now()}`;
@@ -177,6 +196,7 @@ profileForm.addEventListener('submit', async (e) => {
         const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
         updates.URL_del_avatar = urlData.publicUrl;
     }
+
     const { error: updateError } = await supabase.from('profiles').upsert(updates);
     if (updateError) {
         showToast(`Error actualizando perfil: ${updateError.message}`, 'error');
@@ -221,7 +241,6 @@ projectForm.addEventListener('submit', async (e) => {
     const newProject = {
         "ID_de_usuario": user.id,
         titulo: document.getElementById('project-title').value,
-        descripción: document.getElementById('project-description').value,
         objetivos: document.getElementById('project-objetivo').value,
         solucion: document.getElementById('project-solucion').value,
         tecnologias: selectedTechnologies,
@@ -339,13 +358,34 @@ function renderUsersTable(usersToRender) {
             </thead>
             <tbody>
                 ${usersToRender.map(u => {
+                    const isCeoBadge = u.is_ceo ? '<span class="ceo-badge">CEO</span>' : '';
+                    const ceoButtonText = u.is_ceo ? 'Quitar CEO' : 'Hacer CEO';
+
                     if (u.role === 'super_admin') {
-                        return `<tr><td>${u.nombre_completo || 'N/A'} (Super Admin)</td><td>${u.nombre_usuario || 'N/A'}</td><td>-</td></tr>`;
+                        return `<tr>
+                            <td>
+                                <div class="name-container">
+                                    ${u.nombre_completo || 'N/A'} (Super Admin) ${isCeoBadge}
+                                </div>
+                            </td>
+                            <td>${u.nombre_usuario || 'N/A'}</td>
+                            <td>-</td>
+                        </tr>`;
                     }
                     return `<tr>
-                        <td><a href="#" class="user-name-link" data-user-id="${u.identificación}">${u.nombre_completo || 'N/A'}</a></td>
+                        <td>
+                            <div class="name-container">
+                                <a href="#" class="user-name-link" data-user-id="${u.identificación}">${u.nombre_completo || 'N/A'}</a>
+                                ${isCeoBadge}
+                            </div>
+                        </td>
                         <td>${u.nombre_usuario || 'N/A'}</td>
-                        <td><button class="btn-delete" data-user-id="${u.identificación}" data-user-name="${u.nombre_completo || u.nombre_usuario}">Eliminar</button></td>
+                        <td>
+                            <div class="admin-user-actions">
+                                <button class="btn-promote btn-toggle-ceo" data-user-id="${u.identificación}" data-is-ceo="${u.is_ceo}">${ceoButtonText}</button>
+                                <button class="btn-delete" data-user-id="${u.identificación}" data-user-name="${u.nombre_completo || u.nombre_usuario}">Eliminar</button>
+                            </div>
+                        </td>
                     </tr>`;
                 }).join('')}
             </tbody>
@@ -353,7 +393,7 @@ function renderUsersTable(usersToRender) {
 }
 
 async function fetchAllUsersAndRender() {
-    const { data: users, error } = await supabase.from('profiles').select('identificación, nombre_completo, nombre_usuario, role');
+    const { data: users, error } = await supabase.from('profiles').select('*');
     if (error) {
         showToast('Error cargando usuarios.', 'error');
         return;
@@ -398,7 +438,7 @@ async function handleUsersListClick(e) {
         e.preventDefault();
         const userIdToDelete = target.dataset.userId;
         const userName = target.dataset.userName;
-        const confirmed = await showConfirmModal(`Eliminar a ${userName}`, `¿Estás seguro de que quieres eliminar a este miembro? Se borrará su perfil y todos sus proyectos. Esta acción es irreversible.`);
+        const confirmed = await showConfirmModal(`Eliminar a ${userName}`, `¿Estás seguro de que quieres eliminar a este miembro? Esta acción es irreversible.`);
         if (confirmed) {
             await handleUserDelete(userIdToDelete);
         }
@@ -408,7 +448,28 @@ async function handleUsersListClick(e) {
         const userId = target.dataset.userId;
         await showUserInfoModal(userId);
     }
+    if (target.matches('.btn-toggle-ceo')) {
+        e.preventDefault();
+        const userId = target.dataset.userId;
+        const isCurrentlyCeo = target.dataset.isCeo === 'true';
+        await handleToggleCeoStatus(userId, isCurrentlyCeo);
+    }
 }
+
+async function handleToggleCeoStatus(userId, isCurrentlyCeo) {
+    const { error } = await supabase
+        .from('profiles')
+        .update({ is_ceo: !isCurrentlyCeo })
+        .eq('identificación', userId);
+
+    if (error) {
+        showToast(`Error al actualizar el estado: ${error.message}`, 'error');
+    } else {
+        showToast('Estado de CEO actualizado correctamente.', 'success');
+        await fetchAllUsersAndRender();
+    }
+}
+
 
 async function showUserInfoModal(userId) {
     showModal(userInfoModal);
@@ -418,12 +479,17 @@ async function showUserInfoModal(userId) {
         if (error || data.error) throw new Error(error?.message || data.error);
         const userDetails = data.user;
         const defaultAvatar = 'https://via.placeholder.com/150';
+        const isCeoBadge = userDetails.is_ceo ? '<span class="ceo-badge">CEO</span>' : '';
+        
         userInfoContent.innerHTML = `
             <button class="modal-close-btn">×</button>
             <div class="user-info-header">
                 <img src="${userDetails.URL_del_avatar || defaultAvatar}" alt="Avatar de ${userDetails.nombre_completo}" class="user-info-avatar">
                 <div class="user-info-name-stack">
-                    <h3 class="user-info-name">${userDetails.nombre_completo || 'Sin nombre'}</h3>
+                    <div class="name-container">
+                        <h3 class="user-info-name">${userDetails.nombre_completo || 'Sin nombre'}</h3>
+                        ${isCeoBadge}
+                    </div>
                     <p class="user-info-username">@${userDetails.nombre_usuario || 'N/A'}</p>
                 </div>
             </div>

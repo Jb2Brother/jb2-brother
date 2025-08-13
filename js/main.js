@@ -10,9 +10,7 @@ import 'swiper/css/effect-coverflow';
 import lightGallery from 'lightgallery';
 import 'lightgallery/css/lightgallery.css';
 
-// RUTA CORREGIDA: Accediendo a los módulos desde js/main.js
 import { supabase } from './modules/supabase.js';
-import { createProjectSliderCard, createTeamMemberCard } from './modules/ui.js';
 
 // --- IMPORTACIÓN DE IMÁGENES PARA RUTAS CORRECTAS EN PRODUCCIÓN ---
 import logoForLightTheme from '/img/logo-dark.png';
@@ -27,6 +25,93 @@ const header = document.getElementById('header');
 const navMenu = document.getElementById('nav-menu');
 const navToggle = document.getElementById('nav-toggle');
 const navClose = document.getElementById('nav-close');
+
+// =========================================================
+//      MÓDULO DE UI (FUNCIONES PARA CREAR ELEMENTOS HTML)
+// =========================================================
+
+/**
+ * Trunca un texto a una longitud máxima sin cortar palabras.
+ * @param {string} text - El texto a truncar.
+ * @param {number} maxLength - La longitud máxima deseada.
+ * @returns {string} - El texto truncado.
+ */
+function truncateText(text, maxLength) {
+    if (!text || text.length <= maxLength) {
+        return text;
+    }
+    const truncated = text.substr(0, text.lastIndexOf(' ', maxLength));
+    return truncated + '...';
+}
+
+/**
+ * Crea el HTML para una tarjeta de proyecto en el carrusel de la página de inicio.
+ * @param {object} project - El objeto del proyecto que viene de Supabase.
+ * @returns {string} - La cadena HTML de la tarjeta.
+ */
+function createProjectSliderCard(project) {
+    const defaultAvatar = 'https://via.placeholder.com/40';
+    const author = project.profiles;
+    const authorName = author ? author.nombre_completo : 'Anónimo';
+    const authorUsername = author ? author.nombre_usuario : '';
+    const authorAvatar = author ? (author.URL_del_avatar || defaultAvatar) : defaultAvatar;
+    const isCeo = author ? author.is_ceo : false;
+    
+    const ceoBadgeHTML = isCeo ? '<span class="ceo-badge">CEO</span>' : '';
+    const projectDescription = project.objetivos || project.descripción || 'Un proyecto innovador de nuestro equipo.';
+
+    return `
+        <div class="swiper-slide">
+            <div class="project-slider-card">
+                <a href="${project.URL_en_vivo || '#'}" target="_blank" rel="noopener noreferrer" class="project-slider-image-link">
+                    <img src="${project.URL_de_la_imagen}" alt="Imagen del proyecto ${project.titulo}" class="project-slider-image" loading="lazy">
+                </a>
+                <div class="project-slider-info">
+                    <h3 class="project-slider-title">${project.titulo}</h3>
+                    <p class="project-slider-desc">${truncateText(projectDescription, 80)}</p>
+                    <a href="/profile.html?user=${authorUsername}" class="project-author-info">
+                        <img src="${authorAvatar}" alt="Avatar de ${authorName}" class="project-author-avatar" loading="lazy">
+                        <span class="project-author-name">${authorName}</span>
+                        ${ceoBadgeHTML}
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Crea el HTML para una tarjeta de miembro del equipo.
+ * @param {object} profile - El objeto del perfil del usuario que viene de Supabase.
+ * @returns {string} - La cadena HTML de la tarjeta.
+ */
+function createTeamMemberCard(profile) {
+    const defaultAvatar = 'https://via.placeholder.com/120';
+    const ceoRibbonHTML = profile.is_ceo 
+        ? `<div class="ceo-badge-ribbon"><span>CEO</span></div>` 
+        : '';
+    const bio = profile.biografía || 'Un miembro valioso de nuestro equipo.';
+    const truncatedBio = truncateText(bio, 110); // Cortar la biografía
+
+    return `
+        <div class="team-card">
+            ${ceoRibbonHTML}
+            <div class="team-card-header"></div>
+            <a href="${profile.URL_del_avatar || defaultAvatar}" class="team-card-avatar-link" data-src="${profile.URL_del_avatar || defaultAvatar}" data-sub-html="<h4>${profile.nombre_completo}</h4><p>${profile.titulo_profesional}</p>">
+                <img src="${profile.URL_del_avatar || defaultAvatar}" alt="Avatar de ${profile.nombre_completo}" class="team-card-avatar" loading="lazy">
+            </a>
+            <div class="team-card-body">
+                <h3 class="team-card-name">${profile.nombre_completo}</h3>
+                <p class="team-card-title">${profile.titulo_profesional || 'Miembro del Equipo'}</p>
+                <p class="team-card-bio">${truncatedBio}</p>
+            </div>
+            <div class="team-card-footer">
+                <a href="/profile.html?user=${profile.nombre_usuario}" class="btn btn-secondary">Ver Perfil</a>
+            </div>
+        </div>
+    `;
+}
+
 
 // =========================================================
 //      LÓGICA COMÚN (SE EJECUTA EN TODAS LAS PÁGINAS)
@@ -134,8 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async function loadHomepageContent() {
             try {
+                // Ahora pedimos explícitamente la columna 'is_ceo' del perfil relacionado
                 const { data: projects, error: projectsError } = await supabase
-                    .from('proyectos').select(`*, profiles(nombre_usuario, nombre_completo, URL_del_avatar)`)
+                    .from('proyectos').select(`*, profiles(nombre_usuario, nombre_completo, URL_del_avatar, is_ceo)`)
                     .order('creado_en', { ascending: false }).limit(PROJECTS_TO_SHOW);
                 if (projectsError) throw projectsError;
                 renderProjectsSlider(projects);
@@ -171,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sliderContainer.swiper) sliderContainer.swiper.destroy(true, true);
             new Swiper('.projects-slider-container', {
                 modules: [Navigation, Pagination, Autoplay, EffectCoverflow],
-                effect: 'coverflow', grabCursor: true, centeredSlides: true, loop: true,
+                effect: 'coverflow', grabCursor: true, centeredSlides: true, loop: projects.length > 2,
                 slidesPerView: 'auto', spaceBetween: 60,
                 autoplay: { delay: 5000, disableOnInteraction: false },
                 coverflowEffect: { rotate: 20, stretch: 0, depth: 150, modifier: 1, slideShadows: false },

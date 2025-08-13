@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>Panel de Admin | JB2 Brother</title>
     <link rel="icon" href="/img/image.png" type="image/x-icon">
     <!-- Font Awesome -->
@@ -60,9 +60,45 @@
                                         <input type="text" id="job-title">
                                     </div>
                                     <div class="form-group">
-                                        <label for="bio">Biografía</label>
+                                        <label for="bio">Biografía (Sobre Mí)</label>
                                         <textarea id="bio" rows="4"></textarea>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="nationality">Nacionalidad</label>
+                                        <input type="text" id="nationality" placeholder="Ej: Colombiano">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="experience-years">Años de Experiencia</label>
+                                        <input type="number" id="experience-years" placeholder="Ej: 5">
+                                    </div>
+                                    
+                                    <!-- CAMPOS DE GITHUB Y LINKEDIN MODIFICADOS -->
+                                    <div class="form-group">
+                                        <label>GitHub de la Empresa</label>
+                                        <p><a href="https://github.com/Jb2Brother" target="_blank">https://github.com/Jb2Brother</a></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>LinkedIn de la Empresa</label>
+                                        <p><a href="https://www.linkedin.com/in/jb2-brother-94bb8a377/" target="_blank">https://www.linkedin.com/in/jb2-brother-94bb8a377/</a></p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="habilidad_frontend">Habilidad Frontend</label>
+                                        <input type="text" id="habilidad_frontend" placeholder="Ej: React, Next.js, TypeScript">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="habilidad_backend">Habilidad Backend</label>
+                                        <input type="text" id="habilidad_backend" placeholder="Ej: Node.js, Express, Supabase">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="habilidad_db">Habilidad Bases de Datos</label>
+                                        <input type="text" id="habilidad_db" placeholder="Ej: PostgreSQL, MongoDB">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="habilidad_herramientas">Habilidad Herramientas</label>
+                                        <input type="text" id="habilidad_herramientas" placeholder="Ej: Git, Docker, Figma">
+                                    </div>
+
                                     <button type="submit" class="btn btn-primary">Guardar Perfil</button>
                                 </form>
                             </div>
@@ -96,7 +132,6 @@
                             <h3>Añadir Nuevo Proyecto</h3>
                             <form id="project-form">
                                 <div class="form-group"><label for="project-title">Título del Proyecto</label><input type="text" id="project-title" required></div>
-                                <div class="form-group"><label for="project-description">Descripción</label><textarea id="project-description" rows="3" required></textarea></div>
                                 <div class="form-group"><label for="project-objetivo">Objetivo</label><textarea id="project-objetivo" rows="2"></textarea></div>
                                 <div class="form-group"><label for="project-solucion">Solución</label><textarea id="project-solucion" rows="2"></textarea></div>
                                 <div class="form-group">
