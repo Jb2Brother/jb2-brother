@@ -2039,15 +2039,19 @@ body[data-theme="dark"] #user-search-input {
 /* --- Estilo específico para el botón "Hacer/Quitar CEO" --- */
 .btn-toggle-ceo {
     background-color: transparent;
-    color: var(--secondary-color);
-    border-color: var(--secondary-color);
+    color: var(--ceo-gold);
+    border-color: var(--ceo-gold);
 }
 
 .btn-toggle-ceo:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--ceo-gold);
     color: var(--dark-color);
-    box-shadow: 0 2px 8px rgba(251, 192, 45, 0.4);
+    box-shadow: 0 2px 8px rgba(212, 160, 23, 0.4);
     transform: translateY(-1px);
+}
+
+body[data-theme="dark"] .btn-toggle-ceo:hover {
+    color: #111827; /* Texto oscuro para mejor contraste sobre el fondo dorado */
 }
 
 /* --- Estilo específico para el botón "Eliminar" --- */
@@ -2458,11 +2462,14 @@ body[data-theme="dark"] .footer-bottom {
         align-items: center;
     }
 
-    .name-container {
+    .name-container,
+    .presentation-socials,
+    .presentation-stats {
         justify-content: center;
     }
-
-    .presentation-socials {
+    
+    /* ***** CORRECCIÓN PARA CENTRAR LAS TECNOLOGÍAS ***** */
+    .skills-tags-container {
         justify-content: center;
     }
 
