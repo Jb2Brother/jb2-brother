@@ -70,7 +70,7 @@ const credentialForm = document.getElementById('credential-form');
 const credentialMasterPasswordInput = document.getElementById('credential-master-password');
 
 // --- 4. DATOS Y ESTADO ---
-const ALL_TECHNOLOGIES = [ 'HTML5', 'CSS3', 'JavaScript', 'TypeScript','Formspree API','React', 'Next.js', 'Vue.js', 'Angular', 'Node.js', 'Express', 'Python', 'Django', 'Flask', 'Ruby on Rails', 'PHP', 'Laravel', 'Supabase', 'PostgreSQL', 'MySQL', 'MongoDB', 'Firebase', 'SQL', 'NoSQL', 'REST API', 'GraphQL', 'JWT', 'OAuth', 'Git', 'GitHub', 'Docker', 'Vercel', 'Netlify', 'Render', 'AWS', 'Heroku', 'Figma', 'Adobe XD', 'Responsive Design', 'CSS Modules', 'Tailwind CSS', 'Bootstrap', 'Sass/SCSS', 'Vite', 'Webpack', 'PDFKit', 'i18next', 'Swiper.js', 'Vanta.js', 'Fetch API', 'OpenAI API', ].sort();
+const ALL_TECHNOLOGIES = [ 'HTML5', 'CSS3', 'JavaScript', 'TypeScript','Formspree API','React', 'Next.js', 'Vue.js', 'Angular', 'Node.js', 'Express', 'Python', 'Django', 'Flask', 'Ruby on Rails', 'PHP', 'Laravel', 'Supabase', 'PostgreSQL', 'MySQL', 'MongoDB', 'Firebase', 'SQL', 'NoSQL', 'REST API', 'GraphQL', 'JWT', 'OAuth', 'Git', 'GitHub', 'Docker', 'Vercel', 'Netlify', 'Render', 'AWS', 'Heroku', 'Figma', 'Adobe XD', 'Responsive Design', 'CSS Modules', 'Tailwind CSS', 'Bootstrap', 'Sass/SCSS', 'Vite', 'Webpack', 'PDFKit', 'i18next', 'Swiper.js', 'Vanta.js', 'Fetch API', 'OpenAI API',  'CSS Grid', 'GitHub Pages', 'Flexbox', 'Api', 'Api de dicord' ].sort();
 let selectedTechnologies = [];
 let allUsersList = [];
 
