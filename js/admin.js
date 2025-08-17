@@ -1,7 +1,8 @@
 // js/admin.js
 import { supabase } from './modules/supabase.js';
-import logoForLightTheme from '/img/logo-dark.png';
-import logoForDarkTheme from '/img/logo-light.png';
+
+const logoForLightTheme = '/img/logo-dark.png';
+const logoForDarkTheme = '/img/logo-light.png';
 
 let userProfile = null;
 let activeChannelId = null;
@@ -82,11 +83,11 @@ function applyTheme(theme) {
     if (theme === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
         if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        if (headerLogo) headerLogo.src = 'img/logo-light.png';
+        if (headerLogo) headerLogo.src = logoForDarkTheme;
     } else {
         document.body.removeAttribute('data-theme');
         if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        if (headerLogo) headerLogo.src = 'img/logo-dark.png';
+        if (headerLogo) headerLogo.src = logoForLightTheme;
     }
 }
 (function() { const currentTheme = localStorage.getItem('theme') || 'light'; applyTheme(currentTheme); })();
@@ -303,21 +304,38 @@ chatMobileBackBtn.addEventListener('click', () => {
 async function initializeAdminPanel() {
     setupAdminNavigation();
     const { data: profile, error } = await supabase.from('profiles').select('*').eq('identificación', user.id).single();
-    if (error) { showToast('Error fatal al cargar tu perfil.', 'error'); setTimeout(logout, 3000); return; }
+    if (error) { 
+        showToast('Error fatal al cargar tu perfil.', 'error'); 
+        setTimeout(logout, 3000); 
+        return; 
+    }
     userProfile = profile;
+
     const isSuperAdmin = profile.role === 'super_admin';
     const isCeo = profile.is_ceo === true;
-    if (isSuperAdmin) {
-        document.querySelector('.super-admin-or-ceo-only').style.display = 'block';
-        switchView('panel-super-admin');
-    } else if (isCeo) {
-        document.querySelector('.admin-or-ceo-only').style.display = 'block';
-        document.querySelector('.super-admin-or-ceo-only').style.display = 'block';
-        switchView('admin-menu');
-    } else {
-        document.querySelector('.admin-or-ceo-only').style.display = 'block';
-        switchView('panel-admin-normal');
+
+    // ==========================================================
+    // LÓGICA CORREGIDA Y SIMPLIFICADA
+    // ==========================================================
+    
+    // 1. Asegurarse de que la vista del menú principal sea la activa al inicio.
+    switchView('admin-menu');
+    
+    // 2. Mostrar la tarjeta "Mi Panel" a todos los usuarios que llegaron hasta aquí.
+    const miPanelCard = document.querySelector('.menu-card[data-view="panel-admin-normal"]');
+    if (miPanelCard) {
+        miPanelCard.style.display = 'block';
     }
+
+    // 3. Si el usuario es CEO o Super Admin, mostrar también la tarjeta del panel de super admin.
+    if (isCeo || isSuperAdmin) {
+        const superAdminCard = document.querySelector('.menu-card[data-view="panel-super-admin"]');
+        if (superAdminCard) {
+            superAdminCard.style.display = 'block';
+        }
+    }
+    // ==========================================================
+    
     fillProfileForm(profile);
     loadUserProjects(user.id);
     setupTechSelector();
