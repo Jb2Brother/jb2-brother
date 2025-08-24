@@ -8,6 +8,8 @@ let userProfile = null;
 let activeChannelId = null;
 let chatSubscriptions = [];
 let allProfiles = new Map();
+let typingTimeout = null;
+const typingUsers = new Map();
 
 function showToast(message, type = 'success', duration = 4000) {
     const container = document.querySelector('.toast-container');
@@ -24,10 +26,30 @@ function showToast(message, type = 'success', duration = 4000) {
     }, duration);
 }
 
+function formatTimeAgo(dateString) {
+    if (!dateString) return 'Nunca';
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    let interval = seconds / 31536000;
+    if (interval > 1) { const years = Math.floor(interval); return `hace ${years} año${years > 1 ? 's' : ''}`; }
+    interval = seconds / 2592000;
+    if (interval > 1) { const months = Math.floor(interval); return `hace ${months} mes${months > 1 ? 'es' : ''}`; }
+    interval = seconds / 86400;
+    if (interval > 1) { const days = Math.floor(interval); return `hace ${days} día${days > 1 ? 's' : ''}`; }
+    interval = seconds / 3600;
+    if (interval > 1) { const hours = Math.floor(interval); return `hace ${hours} hora${hours > 1 ? 's' : ''}`; }
+    interval = seconds / 60;
+    if (interval > 1) { const minutes = Math.floor(interval); return `hace ${minutes} minuto${minutes > 1 ? 's' : ''}`; }
+    return 'hace unos segundos';
+}
+
 const { data: { session } } = await supabase.auth.getSession();
 if (!session) { window.location.replace('/login.html'); }
 const user = session.user;
 
+// DOM Elements
 const headerLogo = document.querySelector('#header .logo img');
 const logoutButton = document.getElementById('logout-button');
 const themeToggle = document.getElementById('theme-toggle');
@@ -74,6 +96,10 @@ const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
 const scrollToBottomBtn = document.getElementById('scroll-to-bottom-btn');
 const clearChatBtn = document.getElementById('clear-chat-btn');
 const chatMobileBackBtn = document.getElementById('chat-mobile-back-btn');
+const attachFileBtn = document.getElementById('attach-file-btn');
+const fileInput = document.getElementById('file-input');
+const typingIndicator = document.getElementById('typing-indicator');
+const chatUserProfileModal = document.getElementById('chat-user-profile-modal');
 
 const ALL_TECHNOLOGIES = [ 'HTML5', 'CSS3', 'JavaScript', 'TypeScript','Formspree API','React', 'Next.js', 'Vue.js', 'Angular', 'Node.js', 'Express', 'Python', 'Django', 'Flask', 'Ruby on Rails', 'PHP', 'Laravel', 'Supabase', 'PostgreSQL', 'MySQL', 'MongoDB', 'Firebase', 'SQL', 'NoSQL', 'REST API', 'GraphQL', 'JWT', 'OAuth', 'Git', 'GitHub', 'Docker', 'Vercel', 'Netlify', 'Render', 'AWS', 'Heroku', 'Figma', 'Adobe XD', 'Responsive Design', 'CSS Modules', 'Tailwind CSS', 'Bootstrap', 'Sass/SCSS', 'Vite', 'Webpack', 'PDFKit', 'i18next', 'Swiper.js', 'Vanta.js', 'Fetch API', 'OpenAI API',  'CSS Grid', 'GitHub Pages', 'Flexbox', 'Api', 'Api de dicord' ].sort();
 let selectedTechnologies = [];
@@ -106,7 +132,7 @@ function setupAdminNavigation() {
 }
 
 async function fetchAllUserProfiles() {
-    const { data, error } = await supabase.from('profiles').select('identificación, nombre_completo, URL_del_avatar');
+    const { data, error } = await supabase.from('profiles').select('*');
     if (error) { console.error("Error fetching profiles:", error); return; }
     data.forEach(p => allProfiles.set(p.identificación, p));
 }
@@ -126,14 +152,36 @@ function renderMessage(message) {
     messageEl.className = `message ${isOwn ? 'own' : ''}`;
     messageEl.dataset.messageId = message.id;
 
+    let messageBody = '';
+    if (message.file_url) {
+        if (message.file_type && message.file_type.startsWith('image/')) {
+            messageBody = `<a href="${message.file_url}" target="_blank" class="message-image-link"><img src="${message.file_url}" alt="Imagen adjunta" class="message-image"></a>`;
+        } else {
+            const storedFilename = message.file_url.split('/').pop();
+            const displayName = storedFilename ? storedFilename.split('-').slice(2).join('-') : 'archivo_adjunto';
+            messageBody = `
+                <a href="${message.file_url}" target="_blank" download="${displayName}" class="message-file-link">
+                    <i class="fas fa-file-alt"></i>
+                    <div class="file-info">
+                        <span class="file-name">${displayName}</span>
+                    </div>
+                </a>
+            `;
+        }
+    }
+    
+    if (message.content) {
+        messageBody += `<p class="message-text">${message.content}</p>`;
+    }
+
     messageEl.innerHTML = `
-        <img src="${profile.URL_del_avatar}" alt="Avatar" class="message-avatar">
+        <img src="${profile.URL_del_avatar}" alt="Avatar" class="message-avatar" data-user-id="${message.user_id}">
         <div class="message-content">
             <div class="message-header">
                 <span class="message-author">${isOwn ? 'Tú' : profile.nombre_completo}</span>
                 <span class="message-time">${time}</span>
             </div>
-            <p class="message-text">${message.content}</p>
+            ${messageBody}
         </div>
     `;
     
@@ -164,6 +212,24 @@ async function updateReadStatus(channelId) {
     updateGlobalChatNotification();
 }
 
+function updateTypingIndicator() {
+    if (!typingIndicator) return;
+    const users = Array.from(typingUsers.values());
+    if (users.length === 0) {
+        typingIndicator.textContent = '';
+        return;
+    }
+    if (users.length === 1) {
+        typingIndicator.textContent = `${users[0]} está escribiendo...`;
+        return;
+    }
+    if (users.length === 2) {
+        typingIndicator.textContent = `${users[0]} y ${users[1]} están escribiendo...`;
+        return;
+    }
+    typingIndicator.textContent = 'Varios usuarios están escribiendo...';
+}
+
 async function selectChannel(channelId, channelName, channelDescription) {
     if (activeChannelId === channelId) {
         chatContainer.classList.add('mobile-chat-active');
@@ -177,7 +243,8 @@ async function selectChannel(channelId, channelName, channelDescription) {
     chatChannelDescription.textContent = channelDescription;
     messageInput.disabled = false;
     sendButton.disabled = false;
-    
+    attachFileBtn.disabled = false;
+
     if (userProfile && userProfile.is_ceo) {
         clearChatBtn.style.display = 'block';
     } else {
@@ -185,6 +252,9 @@ async function selectChannel(channelId, channelName, channelDescription) {
     }
 
     chatContainer.classList.add('mobile-chat-active');
+    
+    typingUsers.clear();
+    updateTypingIndicator();
 
     await loadMessagesForChannel(channelId);
     await updateReadStatus(channelId);
@@ -210,6 +280,19 @@ async function selectChannel(channelId, channelName, channelDescription) {
             }
         }).subscribe();
     chatSubscriptions.push(messageSubscription);
+
+    const typingSubscription = supabase.channel(`typing-in-${channelId}`)
+        .on('broadcast', { event: 'TYPING' }, ({ payload }) => {
+            if (payload.user_id !== user.id) {
+                if (payload.is_typing) {
+                    typingUsers.set(payload.user_id, payload.user_name);
+                } else {
+                    typingUsers.delete(payload.user_id);
+                }
+                updateTypingIndicator();
+            }
+        }).subscribe();
+    chatSubscriptions.push(typingSubscription);
 }
 
 function updateGlobalChatNotification() {
@@ -276,16 +359,87 @@ async function handleClearChat() {
     }
 }
 
+async function sendTypingStatus(isTyping) {
+    if (!activeChannelId) return;
+    const channel = supabase.channel(`typing-in-${activeChannelId}`);
+    await channel.send({
+        type: 'broadcast',
+        event: 'TYPING',
+        payload: {
+            user_id: user.id,
+            user_name: userProfile.nombre_completo,
+            is_typing: isTyping,
+        },
+    });
+}
+
+messageInput.addEventListener('input', () => {
+    clearTimeout(typingTimeout);
+    sendTypingStatus(true);
+    typingTimeout = setTimeout(() => {
+        sendTypingStatus(false);
+    }, 2000);
+});
+
+
 messageForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    clearTimeout(typingTimeout);
+    sendTypingStatus(false);
     const content = messageInput.value.trim();
     if (content && activeChannelId) {
         messageInput.value = '';
         messageInput.focus();
         const { error } = await supabase.from('chat_messages').insert({ content, user_id: user.id, channel_id: activeChannelId });
-        if (error) showToast('Error al enviar mensaje.', 'error');
+        if (error) showToast(`Error al enviar mensaje: ${error.message}`, 'error');
     }
 });
+
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    event.target.value = null; 
+
+    if (!file || !activeChannelId) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+        showToast('El archivo es demasiado grande (máx 10MB).', 'error');
+        return;
+    }
+
+    showToast('Subiendo archivo...', 'success', 3000);
+    const filePath = `${activeChannelId}/${user.id}-${Date.now()}-${file.name}`;
+
+    try {
+        const { error: uploadError } = await supabase.storage
+            .from('chat_files')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+            .from('chat_files')
+            .getPublicUrl(filePath);
+
+        const fileMessage = {
+            user_id: user.id,
+            channel_id: activeChannelId,
+            file_url: urlData.publicUrl,
+            file_type: file.type,
+            content: '',
+        };
+
+        const { error: insertError } = await supabase.from('chat_messages').insert(fileMessage);
+        if (insertError) throw insertError;
+
+    } catch (error) {
+        showToast(`Error al subir el archivo: ${error.message}`, 'error');
+    }
+}
+
+attachFileBtn.addEventListener('click', () => {
+    if (activeChannelId) fileInput.click();
+});
+fileInput.addEventListener('change', handleFileUpload);
 
 messagesContainer.addEventListener('scroll', () => {
     if (messagesContainer.scrollHeight - messagesContainer.scrollTop > messagesContainer.clientHeight + 300) {
@@ -294,6 +448,51 @@ messagesContainer.addEventListener('scroll', () => {
         scrollToBottomBtn.classList.remove('visible');
     }
 });
+
+async function showChatUserProfileModal(userId) {
+    const modal = document.getElementById('chat-user-profile-modal');
+    if (!modal) return;
+
+    const avatarImg = modal.querySelector('.chat-profile-avatar');
+    const nameEl = modal.querySelector('.chat-profile-name');
+    const usernameEl = modal.querySelector('.chat-profile-username');
+    const bioEl = modal.querySelector('.chat-profile-bio');
+    const memberSinceEl = modal.querySelector('.chat-profile-member-since');
+    const profileLink = document.getElementById('chat-profile-full-link');
+
+    showModal(modal);
+    nameEl.textContent = 'Cargando...';
+    usernameEl.textContent = '';
+    bioEl.textContent = '';
+    memberSinceEl.textContent = '';
+    avatarImg.src = 'https://via.placeholder.com/150';
+
+    const profileData = allProfiles.get(userId);
+
+    if (!profileData) {
+        nameEl.textContent = 'Error al cargar perfil';
+        return showToast('No se pudo encontrar el perfil de este usuario.', 'error');
+    }
+    
+    avatarImg.src = profileData.URL_del_avatar || 'https://via.placeholder.com/150';
+    nameEl.textContent = profileData.nombre_completo || 'Nombre no disponible';
+    usernameEl.textContent = `@${profileData.nombre_usuario || 'N/A'}`;
+    bioEl.textContent = profileData.biografía || 'Este miembro aún no ha añadido una biografía.';
+    
+    // <<<--- CORRECCIÓN DE LA FECHA ---INI--->>>
+    if (profileData.created_at) {
+        memberSinceEl.textContent = new Date(profileData.created_at).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    } else {
+        memberSinceEl.textContent = 'Fecha no disponible';
+    }
+    // <<<--- CORRECCIÓN DE LA FECHA ---FIN--->>>
+    
+    profileLink.href = `/profile.html?user=${profileData.nombre_usuario}`;
+}
 
 scrollToBottomBtn.addEventListener('click', () => scrollToBottom('smooth'));
 clearChatBtn.addEventListener('click', handleClearChat);
@@ -313,28 +512,20 @@ async function initializeAdminPanel() {
 
     const isSuperAdmin = profile.role === 'super_admin';
     const isCeo = profile.is_ceo === true;
-
-    // ==========================================================
-    // LÓGICA CORREGIDA Y SIMPLIFICADA
-    // ==========================================================
     
-    // 1. Asegurarse de que la vista del menú principal sea la activa al inicio.
     switchView('admin-menu');
     
-    // 2. Mostrar la tarjeta "Mi Panel" a todos los usuarios que llegaron hasta aquí.
     const miPanelCard = document.querySelector('.menu-card[data-view="panel-admin-normal"]');
     if (miPanelCard) {
         miPanelCard.style.display = 'block';
     }
 
-    // 3. Si el usuario es CEO o Super Admin, mostrar también la tarjeta del panel de super admin.
     if (isCeo || isSuperAdmin) {
         const superAdminCard = document.querySelector('.menu-card[data-view="panel-super-admin"]');
         if (superAdminCard) {
             superAdminCard.style.display = 'block';
         }
     }
-    // ==========================================================
     
     fillProfileForm(profile);
     loadUserProjects(user.id);
@@ -357,9 +548,22 @@ async function initializeAdminPanel() {
         rulesListAdmin.addEventListener('click', handleRulesListClick);
         cancelEditRuleBtn.addEventListener('click', resetRuleForm);
     }
+    
+    messagesContainer.addEventListener('click', (e) => {
+        if (e.target.matches('.message-avatar')) {
+            const userId = e.target.dataset.userId;
+            if (userId) {
+                showChatUserProfileModal(userId);
+            }
+        }
+    });
+
     userInfoModal.addEventListener('click', e => (e.target === userInfoModal || e.target.classList.contains('modal-close-btn')) && hideModal(userInfoModal));
     confirmModal.addEventListener('click', e => e.target === confirmModal && hideModal(confirmModal));
     confirmCancelBtn.addEventListener('click', () => hideModal(confirmModal));
+    chatUserProfileModal.addEventListener('click', e => (e.target === chatUserProfileModal || e.target.matches('.modal-close-btn')) && hideModal(chatUserProfileModal));
+
+    logoutButton.addEventListener('click', logout);
 }
 
 function fillProfileForm(profile) { document.getElementById('full-name').value = profile.nombre_completo || ''; document.getElementById('avatar-preview').src = profile.URL_del_avatar || 'https://via.placeholder.com/150'; document.getElementById('job-title').value = profile.titulo_profesional || ''; document.getElementById('bio').value = profile.biografía || ''; document.getElementById('nationality').value = profile.nacionalidad || ''; document.getElementById('experience-years').value = profile.años_de_experiencia || ''; document.getElementById('habilidad_frontend').value = profile.habilidad_frontend || ''; document.getElementById('habilidad_backend').value = profile.habilidad_backend || ''; document.getElementById('habilidad_db').value = profile.habilidad_db || ''; document.getElementById('habilidad_herramientas').value = profile.habilidad_herramientas || ''; }
@@ -373,7 +577,7 @@ function renderUsersTable(usersToRender) { if (usersToRender.length === 0) { use
 async function fetchAllUsersAndRender() { const { data: users, error } = await supabase.from('profiles').select('*'); if (error) { showToast('Error cargando usuarios.', 'error'); return; } allUsersList = users; renderUsersTable(allUsersList); }
 function handleUserSearch(event) { const searchTerm = event.target.value.toLowerCase().trim(); if (!searchTerm) { renderUsersTable(allUsersList); return; } const filteredUsers = allUsersList.filter(user => (user.nombre_completo && user.nombre_completo.toLowerCase().includes(searchTerm)) || (user.nombre_usuario && user.nombre_usuario.toLowerCase().includes(searchTerm))); renderUsersTable(filteredUsers); }
 async function handleUsersListClick(e) { const target = e.target; if (target.matches('.btn-delete[data-user-id]')) { e.preventDefault(); const userIdToDelete = target.dataset.userId; const userName = target.dataset.userName; const confirmed = await showConfirmModal(`Eliminar a ${userName}`, `¿Seguro que quieres eliminar a este miembro?`); if (confirmed) await handleUserDelete(userIdToDelete); } if (target.matches('.user-name-link')) { e.preventDefault(); const userId = target.dataset.userId; await showUserInfoModal(userId); } if (target.matches('.btn-toggle-ceo')) { e.preventDefault(); const userId = target.dataset.userId; const isCurrentlyCeo = target.dataset.isCeo === 'true'; await handleToggleCeoStatus(userId, isCurrentlyCeo); } }
-async function handleToggleCeoStatus(userId, isCurrentlyCeo) { const { error } = await supabase.from('profiles').update({ is_ceo: !isCurrentlyCeo }).eq('identificación', userId); if (error) showToast(`Error al actualizar estado: ${error.message}`, 'error'); else { showToast('Estado de CEO actualizado.', 'success'); await fetchAllUsersAndRender(); } }
+async function handleToggleCeoStatus(userId, isCurrentlyCeo) { const { error } = await supabase.from('profiles').update({ is_ceo: !isCurrentlyCeo }).eq('identificación', userId); if (error) { showToast(`Error al actualizar estado: ${error.message}`, 'error'); } else { showToast('Estado de CEO actualizado.', 'success'); await fetchAllUsersAndRender(); } }
 async function showUserInfoModal(userId) { showModal(userInfoModal); userInfoContent.innerHTML = '<p>Cargando...</p>'; try { const { data, error } = await supabase.functions.invoke('get-user-details', { body: { userId } }); if (error || data.error) throw new Error(error?.message || data.error); const d = data.user; const b = d.is_ceo ? '<span class="ceo-badge">CEO</span>' : ''; userInfoContent.innerHTML = `<button class="modal-close-btn">×</button><div class="user-info-header"><img src="${d.URL_del_avatar || 'https://via.placeholder.com/150'}" alt="Avatar" class="user-info-avatar"><div class="user-info-name-stack"><div class="name-container"><h3 class="user-info-name">${d.nombre_completo || 'N/A'}</h3>${b}</div><p class="user-info-username">@${d.nombre_usuario || 'N/A'}</p></div></div><div class="user-info-body"><div class="user-info-stat"><strong>${d.projectsCount}</strong>Proyectos</div><div class="user-info-stat"><strong>${formatTimeAgo(d.last_sign_in_at)}</strong>Último login</div></div><div class="user-info-footer"><a href="/profile.html?user=${d.nombre_usuario}" class="btn btn-primary" target="_blank">Ver Perfil</a></div>`; } catch (err) { userInfoContent.innerHTML = `<button class="modal-close-btn">×</button><p>Error: ${err.message}</p>`; } }
 async function handleCreateUser(e) { e.preventDefault(); const d = { email: document.getElementById('new-user-email').value, password: document.getElementById('new-user-password').value, username: document.getElementById('new-user-username').value, full_name: document.getElementById('new-user-fullname').value }; const { data, error } = await supabase.functions.invoke('create-user', { body: JSON.stringify(d) }); if (error) showToast(`Error: ${error.message}`, 'error'); else if (data.error) showToast(`Error: ${data.error}`, 'error'); else { showToast(`Usuario ${d.email} creado.`, 'success'); createUserForm.reset(); await fetchAllUsersAndRender(); } }
 async function handleUserDelete(userIdToDelete) { const { data, error } = await supabase.functions.invoke('delete-user', { body: JSON.stringify({ userId: userIdToDelete }) }); if (error || data.error) showToast(`Error: ${error?.message || data.error}`, 'error'); else { showToast('Usuario eliminado.', 'success'); await fetchAllUsersAndRender(); } }
@@ -394,6 +598,5 @@ function showConfirmModal(title, message) { return new Promise((resolve) => { co
 function showModal(modalElement) { modalElement.classList.remove('hidden'); }
 function hideModal(modalElement) { modalElement.classList.add('hidden'); }
 async function logout() { await supabase.auth.signOut(); window.location.replace('/'); }
-logoutButton.addEventListener('click', logout);
 
 initializeAdminPanel();

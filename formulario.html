@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cuestionario de Programación | JB2 Brother</title>
+    <link rel="shortcut icon" href="/public/img/image.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- VARIABLES DE COLOR DEL PANEL DE ADMIN --- */
+        :root {
+            --primary-color: #00838F;
+            --secondary-color: #FBC02D;
+            --dark-color: #263238;
+            --light-color: #F4F6F7;
+            --white-color: #FFFFFF;
+            --text-color: #455A64;
+            --bg-color: var(--white-color);
+            --card-bg: var(--white-color);
+            --text-color-inverted: var(--dark-color);
+            --border-color: #E0E0E0;
+            --danger-color: #c0392b;
+            --font-primary: 'Poppins', sans-serif;
+            --font-secondary: 'Playfair Display', serif;
+        }
+
+        body[data-theme="dark"] {
+            --primary-color: #3B82F6;
+            --secondary-color: #FBBF24;
+            --dark-color: #F9FAFB;
+            --light-color: #1F2937;
+            --white-color: #111827;
+            --text-color: #D1D5DB;
+            --bg-color: #111827;
+            --card-bg: #1F2937;
+            --text-color-inverted: #D1D5DB;
+            --border-color: #374151;
+            --danger-color: #ef4444;
+        }
+
+        /* --- ESTILOS GENERALES Y NAVEGACIÓN --- */
+        body {
+            color: var(--text-color);
+            font-family: var(--font-primary);
+            background-color: var(--bg-color);
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo-small { height: 50px; }
+        .nav-link { 
+            color: var(--text-color-inverted); 
+            font-weight: 600;
+        }
+        .nav-link:hover { color: var(--primary-color); }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        /* --- ESTILOS DEL FORMULARIO --- */
+        .main-container { 
+            background-color: var(--card-bg); 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        body[data-theme="dark"] .main-container {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .main-title {
+            font-family: var(--font-secondary);
+            color: var(--dark-color);
+        }
+
+        .form-section-header { 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 0.75rem; 
+            margin-bottom: 1.5rem; 
+            color: var(--dark-color); 
+            font-size: 1.25rem; 
+            font-weight: 600;
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+        }
+        .form-section-header i { color: var(--primary-color); }
+        
+        label { color: var(--dark-color) !important; font-weight: 600; }
+        
+        .form-input { 
+            background-color: var(--bg-color) !important; 
+            border: 1px solid var(--border-color) !important; 
+            color: var(--text-color-inverted) !important; 
+            border-radius: 5px;
+            transition: all 0.3s ease; 
+        }
+        .form-input:focus { 
+            border-color: var(--primary-color) !important; 
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
+            outline: none;
+        }
+        .form-input.error { border-color: var(--danger-color) !important; }
+
+        .btn-primary { 
+            background-color: var(--primary-color) !important;
+            border: 2px solid var(--primary-color) !important;
+            color: white !important;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease; 
+        }
+        .btn-primary:hover { 
+            background-color: color-mix(in srgb, var(--primary-color) 85%, black) !important;
+            border-color: color-mix(in srgb, var(--primary-color) 85%, black) !important;
+            transform: translateY(-3px); 
+            box-shadow: 0 4px 15px color-mix(in srgb, var(--primary-color) 30%, transparent) !important; 
+        }
+
+        .admin-panel-btn { 
+            position: fixed; bottom: 20px; right: 20px; z-index: 100; 
+            background-color: var(--card-bg); color: var(--text-color); 
+            width: 50px; height: 50px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid var(--border-color); 
+            transition: all 0.3s ease; 
+        }
+        .admin-panel-btn:hover { 
+            background-color: var(--primary-color); color: white; 
+            transform: scale(1.1) rotate(45deg); 
+        }
+        .fa-spin-hover:hover {
+            animation: fa-spin 1.5s infinite linear;
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+
+    <!-- Barra de Navegación -->
+    <nav class="navbar w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 w-full">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="/public/img/logo-dark.png" alt="Logo" class="logo-small">
+                <span class="text-2xl font-bold nav-link hidden sm:block">JB2 Soport</span>
+            </a>
+            
+            <div class="flex items-center gap-4">
+                <button id="theme-toggle" class="theme-toggle"><i class="fas fa-sun"></i></button>
+                <a href="https://discord.gg/yefznYSch3" target="_blank" class="nav-link text-2xl" rel="noopener noreferrer" title="Únete a nuestro Discord">
+                    <i class="fab fa-discord"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 py-8 flex-grow flex items-center justify-center">
+        <div class="w-full max-w-4xl main-container rounded-xl p-6 md:p-10">
+            <div id="form-container">
+                <h2 class="text-4xl font-bold text-center mb-2 main-title">Cuestionario de Programación</h2>
+                <p class="text-center text-gray-500 dark:text-gray-400 mb-10">Demuestra tus conocimientos para unirte al equipo.</p>
+
+                <form id="whitelist-form" class="space-y-12">
+                    <!-- Sección de Datos Personales -->
+                     <div class="space-y-6">
+                        <h3 class="form-section-header"><i class="fas fa-user-circle"></i><span>Tus Datos</span></h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="ooc-name" class="block mb-2">Tu nombre completo</label>
+                                <input type="text" id="ooc-name" class="form-input w-full p-3" placeholder="Nombre y Apellido">
+                                <div class="hidden text-red-500 text-sm mt-1" id="ooc-name-error">Este campo es obligatorio</div>
+                            </div>
+                            <div>
+                                <label class="block mb-2">Género</label>
+                                <div class="flex items-center space-x-6 mt-3">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="gender" value="Masculino" class="form-radio h-5 w-5 text-purple-600">
+                                        <span class="ml-2">Masculino</span>
+                                    </label>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="gender" value="Femenino" class="form-radio h-5 w-5 text-purple-600">
+                                        <span class="ml-2">Femenino</span>
+                                    </label>
+                                </div>
+                                <div class="hidden text-red-500 text-sm mt-1" id="gender-error">Selecciona una opción</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección Preguntas Básicas -->
+                    <div class="space-y-6">
+                        <h3 class="form-section-header"><i class="fas fa-code"></i><span>🟢 Nivel Básico</span></h3>
+                        
+                        <div>
+                            <label for="q1" class="block mb-2">1. ¿Qué es HTML y para qué se utiliza en desarrollo web?</label>
+                            <textarea id="q1" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q1-error">Este campo es obligatorio</div>
+                        </div>
+                        <div>
+                            <label for="q2" class="block mb-2">2. ¿Qué es CSS y cómo se aplica a una página HTML?</label>
+                            <textarea id="q2" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q2-error">Este campo es obligatorio</div>
+                        </div>
+                        <div>
+                            <label for="q3" class="block mb-2">3. ¿Qué es JavaScript y cuál es su función principal en un sitio web?</label>
+                            <textarea id="q3" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q3-error">Este campo es obligatorio</div>
+                        </div>
+                        <div>
+                            <label for="q4" class="block mb-2">4. ¿Cuál es la diferencia entre una etiqueta &lt;div&gt; y una &lt;span&gt;?</label>
+                            <textarea id="q4" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q4-error">Este campo es obligatorio</div>
+                        </div>
+                        <div>
+                            <label for="q5" class="block mb-2">5. ¿Para qué sirve la etiqueta &lt;a&gt; en HTML? ¿Cómo se crea un enlace a otra página?</label>
+                            <textarea id="q5" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q5-error">Este campo es obligatorio</div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Sección Preguntas Avanzadas (CORREGIDAS) -->
+                    <div class="space-y-6">
+                        <h3 class="form-section-header"><i class="fas fa-brain"></i><span>🔴 Nivel Avanzado</span></h3>
+                        
+                        <div>
+                            <label for="q11" class="block mb-2">1. En JavaScript, explica la diferencia entre `var`, `let` y `const` en cuanto al alcance (scope).</label>
+                            <textarea id="q11" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q11-error">Este campo es obligatorio</div>
+                        </div>
+                         <div>
+                            <label for="q12" class="block mb-2">2. ¿Qué es una API REST? Describe brevemente para qué se usan los verbos HTTP comunes (GET, POST).</label>
+                            <textarea id="q12" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q12-error">Este campo es obligatorio</div>
+                        </div>
+                        <div>
+                            <label for="q13" class="block mb-2">3. ¿Cuál es la principal diferencia entre CSS Flexbox y CSS Grid? ¿En qué situación preferirías usar uno sobre el otro?</label>
+                            <textarea id="q13" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q13-error">Este campo es obligatorio</div>
+                        </div>
+                        <div>
+                            <label for="q14" class="block mb-2">4. ¿Qué es el DOM (Document Object Model) y por qué es fundamental para la manipulación de páginas web con JavaScript?</label>
+                            <textarea id="q14" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q14-error">Este campo es obligatorio</div>
+                        </div>
+                        <div>
+                            <label for="q15" class="block mb-2">5. Explica qué hace `async/await` en JavaScript y qué problema común soluciona al trabajar con Promesas.</label>
+                            <textarea id="q15" class="form-input w-full p-3 question-area" rows="3"></textarea>
+                            <div class="hidden text-red-500 text-sm mt-1" id="q15-error">Este campo es obligatorio</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center pt-4">
+                        <button type="submit" id="submit-btn" class="btn-primary px-10 py-3 text-lg w-full md:w-auto">
+                            <i class="fas fa-paper-plane mr-2"></i> <span>Enviar Cuestionario</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="closed-message" class="hidden text-center py-10">
+                <i class="fas fa-lock text-6xl" style="color: var(--danger-color);"></i>
+                <h2 class="text-3xl font-bold mt-4" style="color: var(--danger-color);">Formulario Cerrado</h2>
+                <p class="mt-2 text-lg">Las solicitudes se encuentran cerradas por el momento. <br> Vuelve a intentarlo más tarde o consulta nuestro Discord.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botón de Panel de Admin -->
+    <button id="admin-panel-btn" class="admin-panel-btn" title="Panel de Administrador">
+        <i class="fas fa-cog fa-spin-hover text-2xl"></i>
+    </button>
+
+    <script>
+    $(document).ready(function() {
+        // --- CONFIGURACIÓN ---
+        const webhookUrl = "https://discord.com/api/webhooks/1406793305412337876/A96IxOeEJCqD2cImfoZiD2OglJq3awNG-YzPOBsmxJSXVcL_iSOFnFqJjKWmVnzKHBlg";
+        const adminPassword = "JB1805"; // Tu contraseña de admin
+        const logoUrl = "https://i.imgur.com/ePYxSCh.png";
+        
+        // --- LÓGICA DE TEMAS ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            } else {
+                document.body.removeAttribute('data-theme');
+                if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        };
+        (function() { 
+            const currentTheme = localStorage.getItem('theme') || 'light'; 
+            applyTheme(currentTheme); 
+        })();
+        if (themeToggle) { 
+            themeToggle.addEventListener('click', () => { 
+                let theme = document.body.getAttribute('data-theme'); 
+                if (theme === 'dark') { 
+                    localStorage.removeItem('theme'); 
+                    applyTheme('light'); 
+                } else { 
+                    localStorage.setItem('theme', 'dark'); 
+                    applyTheme('dark'); 
+                } 
+            }); 
+        }
+
+        // --- LÓGICA DEL PANEL DE ADMIN (RESTAURADA) ---
+        function checkWhitelistStatus() {
+            if (localStorage.getItem('whitelist_status') === 'closed') {
+                $('#form-container').hide();
+                $('#closed-message').removeClass('hidden').show();
+            } else {
+                $('#form-container').show();
+                $('#closed-message').addClass('hidden').hide();
+            }
+        }
+        checkWhitelistStatus();
+
+        $('#admin-panel-btn').on('click', async function() {
+            const { value: password } = await Swal.fire({
+                title: 'Acceso de Administrador', input: 'password', inputPlaceholder: 'Ingresa la contraseña', showCancelButton: true,
+                confirmButtonText: 'Acceder', cancelButtonText: 'Cancelar', background: 'var(--card-bg)', color: 'var(--dark-color)',
+                customClass: { 
+                    confirmButton: 'btn-primary px-6 py-2 rounded-lg text-white font-bold', 
+                    cancelButton: 'bg-gray-500 hover:bg-gray-600 text-white font-bold px-6 py-2 rounded-lg'
+                }, buttonsStyling: false
+            });
+
+            if (password === adminPassword) {
+                const isClosed = localStorage.getItem('whitelist_status') === 'closed';
+                Swal.fire({
+                    title: 'Panel de Control',
+                    html: `<p style="color: var(--text-color);" class="mb-4">Usa el interruptor para abrir o cerrar las postulaciones.</p>
+                           <label class="flex items-center justify-center cursor-pointer">
+                               <span class="mr-3 text-lg font-medium" style="color: var(--text-color);">Cerrada</span>
+                               <div class="relative">
+                                   <input type="checkbox" id="whitelist-toggle" class="sr-only" ${isClosed ? '' : 'checked'}>
+                                   <div class="block bg-gray-600 w-14 h-8 rounded-full"></div>
+                                   <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform"></div>
+                               </div>
+                               <style>input:checked + .block { background-color: color-mix(in srgb, var(--primary-color) 40%, white); } input:checked ~ .dot { transform: translateX(100%); background-color: var(--primary-color); }</style>
+                               <span class="ml-3 text-lg font-medium" style="color: var(--text-color);">Abierta</span>
+                           </label>`,
+                    background: 'var(--card-bg)', color: 'var(--dark-color)', showConfirmButton: false,
+                    didOpen: () => {
+                        $('#whitelist-toggle').on('change', function() {
+                            const title = this.checked ? 'Postulaciones Abiertas' : 'Postulaciones Cerradas';
+                            localStorage.setItem('whitelist_status', this.checked ? 'open' : 'closed');
+                            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: title, showConfirmButton: false, timer: 2000, background: 'var(--card-bg)', color: 'var(--dark-color)' });
+                            checkWhitelistStatus();
+                        });
+                    }
+                });
+            } else if (password) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Contraseña incorrecta.', background: 'var(--card-bg)', color: 'var(--dark-color)' });
+            }
+        });
+        
+        // --- LÓGICA DEL FORMULARIO ---
+        function validateField(element, condition, errorElementId, errorMessage) {
+            const errorEl = $(`#${errorElementId}`);
+            if (!condition) {
+                $(element).addClass('error');
+                errorEl.text(errorMessage).removeClass('hidden');
+                return false;
+            }
+            $(element).removeClass('error');
+            errorEl.addClass('hidden');
+            return true;
+        }
+
+        function validateRadio(name, errorElementId, errorMessage) {
+            const errorEl = $(`#${errorElementId}`);
+            if ($(`input[name="${name}"]:checked`).length === 0) {
+                errorEl.text(errorMessage).removeClass('hidden');
+                return false;
+            }
+            errorEl.addClass('hidden');
+            return true;
+        }
+        
+        $('#whitelist-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            if (localStorage.getItem('whitelist_status') === 'closed') {
+                Swal.fire({ icon: 'error', title: 'Formulario Cerrado', text: 'Las postulaciones están cerradas en este momento.', background: 'var(--card-bg)', color: 'var(--dark-color)' });
+                return;
+            }
+
+            let isFormValid = true;
+            if (!validateField($('#ooc-name'), $('#ooc-name').val().trim() !== '', 'ooc-name-error', 'Este campo es obligatorio')) isFormValid = false;
+            if (!validateRadio('gender', 'gender-error', 'Selecciona una opción')) isFormValid = false;
+            
+            $('.question-area').each(function() {
+                if (!validateField(this, $(this).val().trim() !== '', `${this.id}-error`, 'Este campo es obligatorio')) {
+                    isFormValid = false;
+                }
+            });
+
+            if (!isFormValid) {
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Formulario Incompleto', 
+                    text: 'Por favor, responde todas las preguntas.', 
+                    background: 'var(--card-bg)', 
+                    color: 'var(--dark-color)'
+                });
+                return;
+            }
+
+            Swal.fire({ 
+                title: 'Enviando Cuestionario...', 
+                text: 'Por favor, espera.', 
+                allowOutsideClick: false, 
+                background: 'var(--card-bg)', 
+                color: 'var(--dark-color)',
+                didOpen: () => Swal.showLoading() 
+            });
+
+            const formData = {
+                oocName: $('#ooc-name').val().trim(),
+                gender: $('input[name="gender"]:checked').val(),
+                q1: $('#q1').val().trim(),
+                q2: $('#q2').val().trim(),
+                q3: $('#q3').val().trim(),
+                q4: $('#q4').val().trim(),
+                q5: $('#q5').val().trim(),
+                q11: $('#q11').val().trim(),
+                q12: $('#q12').val().trim(),
+                q13: $('#q13').val().trim(),
+                q14: $('#q14').val().trim(),
+                q15: $('#q15').val().trim(),
+            };
+
+            const discordPayload = {
+                username: "Gestor de Cuestionarios | JB2 Brother",
+                avatar_url: logoUrl,
+                embeds: [{
+                    color: 3447003, // Color azulado
+                    author: { name: `💌 Nuevo Cuestionario de ${formData.oocName}`, icon_url: logoUrl },
+                    description: `**Género:** ${formData.gender}`,
+                    fields: [
+                        { name: "🟢 1. ¿Qué es HTML?", value: "```\n" + (formData.q1 || "Sin respuesta") + "\n```" },
+                        { name: "🟢 2. ¿Qué es CSS?", value: "```\n" + (formData.q2 || "Sin respuesta") + "\n```" },
+                        { name: "🟢 3. ¿Qué es JavaScript?", value: "```\n" + (formData.q3 || "Sin respuesta") + "\n```" },
+                        { name: "🟢 4. ¿Diferencia <div> y <span>?", value: "```\n" + (formData.q4 || "Sin respuesta") + "\n```" },
+                        { name: "🟢 5. ¿Etiqueta <a>?", value: "```\n" + (formData.q5 || "Sin respuesta") + "\n```" },
+                        { name: "🔴 1. Diferencia var, let y const", value: "```\n" + (formData.q11 || "Sin respuesta") + "\n```" },
+                        { name: "🔴 2. ¿Qué es una API REST?", value: "```\n" + (formData.q12 || "Sin respuesta") + "\n```" },
+                        { name: "🔴 3. Flexbox vs Grid", value: "```\n" + (formData.q13 || "Sin respuesta") + "\n```" },
+                        { name: "🔴 4. ¿Qué es el DOM?", value: "```\n" + (formData.q14 || "Sin respuesta") + "\n```" },
+                        { name: "🔴 5. ¿Qué hace async/await?", value: "```\n" + (formData.q15 || "Sin respuesta") + "\n```" },
+                    ],
+                    footer: { text: `Enviado por ${formData.oocName}` },
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            fetch(webhookUrl, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(discordPayload)
+            }).then(response => {
+                if (!response.ok) throw new Error(`Webhook error: ${response.status}`);
+                Swal.fire({ 
+                    icon: 'success', 
+                    title: '¡Cuestionario Enviado!', 
+                    text: 'Tus respuestas han sido recibidas y serán revisadas.', 
+                    background: 'var(--card-bg)', 
+                    color: 'var(--dark-color)'
+                });
+                $('#whitelist-form')[0].reset();
+                $('.form-input, textarea').removeClass('error');
+                $('.text-red-500').addClass('hidden');
+            }).catch(error => {
+                console.error("Error al enviar a webhook:", error);
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Error de Envío', 
+                    text: 'No se pudo enviar tu cuestionario. Contacta a un administrador.', 
+                    background: 'var(--card-bg)', 
+                    color: 'var(--dark-color)'
+                });
+            });
+        });
+    });
+    </script>
+    
+</body>
+</html>

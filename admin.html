@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Admin | JB2 Brother</title>
-    <!-- CORRECCIÓN: Ruta absoluta para el favicon -->
     <link rel="icon" href="/img/image.png" type="image/x-icon">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="sub-page">
@@ -20,7 +16,6 @@
     <header id="header">
         <nav class="container">
             <a href="/" class="logo">
-                <!-- CORRECCIÓN: Ruta absoluta para el logo -->
                 <img src="/img/logo-dark.png" alt="Logo JB2 Brother">
                 <span>JB2 Brother</span>
             </a>
@@ -98,11 +93,16 @@
                                     </div>
                                 </div>
                                 <div id="chat-messages-container" class="chat-messages"></div>
+                                <div id="typing-indicator" class="typing-indicator"></div>
                                 <button id="scroll-to-bottom-btn" class="btn-scroll-down">
                                     <i class="fas fa-chevron-down"></i>
                                 </button>
                                 <div class="chat-input-area">
                                     <form id="chat-message-form">
+                                        <button type="button" class="btn-attach" id="attach-file-btn" title="Adjuntar archivo">
+                                            <i class="fas fa-paperclip"></i>
+                                        </button>
+                                        <input type="file" id="file-input" style="display: none;" accept="image/*, application/pdf, .doc, .docx, .xls, .xlsx, .zip, .rar">
                                         <input type="text" id="chat-message-input" placeholder="Escribe un mensaje..." autocomplete="off" disabled>
                                         <button type="submit" class="btn-send" disabled><i class="fas fa-paper-plane"></i></button>
                                     </form>
@@ -211,8 +211,37 @@
             </div>
         </section>
 
+        <!-- MODALES -->
         <div id="user-info-modal" class="modal-overlay hidden"><div id="user-info-content" class="modal-content user-info-card"></div></div>
+        
         <div id="confirm-modal" class="modal-overlay hidden"><div class="modal-content confirm-dialog"><h3 id="confirm-title">Confirmar</h3><p id="confirm-message">¿Estás seguro?</p><div class="confirm-actions"><button id="confirm-cancel-btn" class="btn btn-secondary">Cancelar</button><button id="confirm-ok-btn" class="btn btn-primary">OK</button></div></div></div>
+        
+        <div id="chat-user-profile-modal" class="modal-overlay hidden">
+            <div class="modal-content chat-profile-card">
+                <button class="modal-close-btn">&times;</button>
+                <div class="chat-profile-banner" style="background-image: url('/img/default-banner.png');"></div>
+                <div class="chat-profile-header">
+                    <div class="chat-profile-avatar-wrapper">
+                        <img src="" alt="Avatar" class="chat-profile-avatar">
+                         <div class="status-dot-large"></div>
+                    </div>
+                </div>
+                <div class="chat-profile-body">
+                    <h3 class="chat-profile-name"></h3>
+                    <p class="chat-profile-username"></p>
+                    <div class="chat-profile-divider"></div>
+                    <div class="chat-profile-info">
+                        <h4>Sobre Mí</h4>
+                        <p class="chat-profile-bio"></p>
+                        <h4>Miembro Desde</h4>
+                        <p class="chat-profile-member-since"></p>
+                    </div>
+                </div>
+                 <div class="chat-profile-footer">
+                     <a href="#" class="btn btn-primary" id="chat-profile-full-link" target="_blank">Ver Perfil Completo</a>
+                 </div>
+            </div>
+        </div>
     </main>
  
     <script type="module" src="js/admin.js"></script>
